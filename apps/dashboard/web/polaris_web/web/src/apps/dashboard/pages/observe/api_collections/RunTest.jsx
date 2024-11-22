@@ -64,6 +64,8 @@ function RunTest({ endpoints, filtered, apiCollectionId, disabled, runTestFromOu
     const [optionsSelected, setOptionsSelected] = useState(initialArr)
     const [slackIntegrated, setSlackIntegrated] = useState(false)
 
+    const [testAlreadyRunning, setTestAlreadyRunning] = useState(false)
+
     const localCategoryMap = LocalStore.getState().categoryMap
     const localSubCategoryMap = LocalStore.getState().subCategoryMap
 
@@ -406,6 +408,7 @@ function RunTest({ endpoints, filtered, apiCollectionId, disabled, runTestFromOu
     }
 
     async function handleRun() {
+        setTestAlreadyRunning(true)
         const { startTimestamp, recurringDaily, testName, testRunTime, maxConcurrentRequests, overriddenTestAppUrl, testRoleId, continuousTesting, sendSlackAlert } = testRun
         const collectionId = parseInt(apiCollectionId)
 
@@ -456,6 +459,7 @@ function RunTest({ endpoints, filtered, apiCollectionId, disabled, runTestFromOu
             </HorizontalStack>
         )
 
+        setTestAlreadyRunning(false)
         func.setToast(true, false, <div data-testid="test_run_created_message">{forwardLink}</div>)
 
     }
@@ -518,7 +522,7 @@ function RunTest({ endpoints, filtered, apiCollectionId, disabled, runTestFromOu
                 primaryAction={{
                     content: scheduleString(),
                     onAction: handleRun,
-                    disabled: !testRun.authMechanismPresent
+                    disabled: !testRun.authMechanismPresent || testAlreadyRunning
                 }}
                 large
             >
